@@ -22,7 +22,7 @@ export default class App extends Component {
         <Text style={styles.title}>To-do App</Text>
         <View style={styles.card}>
           <TextInput style={styles.input}
-           placeholder={"New todo"}
+           placeholder={"New To Do"}
            value = {newToDo}
            placeholderTextColor={"#999"}
            onChangeText={this._controlNewToDo}
