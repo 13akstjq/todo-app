@@ -22,14 +22,14 @@ export default class App extends Component {
         <Text style={styles.title}>To-do App</Text>
         <View style={styles.card}>
           <TextInput style={styles.input}
-           placeholder={"new todo"}
+           placeholder={"New todo"}
            value = {newToDo}
            placeholderTextColor={"#999"}
            onChangeText={this._controlNewToDo}
            returnKeyType={"done"}
            autoCorrect={false}
            ></TextInput>
-           <ScrollView>
+           <ScrollView contentContainerStyle={styles.toDos}>
              <Todo></Todo>
            </ScrollView>
         </View>
@@ -78,6 +78,9 @@ const styles = StyleSheet.create({
     fontSize : 42,
     borderBottomColor : "#ddd",
     borderBottomWidth : 1
+  },
+  toDos : {
+    alignItems : "center"
   }
 
 });
