@@ -1,19 +1,54 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React , {Component}from 'react';
+import { StyleSheet, Text, View,StatusBar,Dimensions ,Platform } from 'react-native';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-    </View>
-  );
+const {height,width} = Dimensions.get("window");
+export default class App extends Component {
+  render(){
+    return (
+      <View style={styles.container}>
+        <StatusBar barStyle="light-content"></StatusBar>
+        <Text style={styles.title}>To-do App</Text>
+        <View style={styles.card}>
+          <Text>New to do</Text>
+        </View>
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F23657',
     alignItems: 'center',
-    justifyContent: 'center',
   },
+  title : {
+    color : "white",
+    fontSize : 25,
+    marginTop : 20,
+    fontWeight : "100",
+    marginBottom : 30
+  },
+  card : {
+    backgroundColor : "#FFF",
+    flex : 1,
+    width : width -25,
+    borderTopLeftRadius : 10,
+    borderTopRightRadius : 10,
+    
+    ...Platform.select({
+      ios : {
+        shadowColor : "rgb(50,50,50)",
+        shadowOpacity : 0.5,
+        shadowRadious : 5,
+        shadowOffset : {
+          height : -1,
+          width : 0
+        }
+      },
+      android : {
+        elevation : 5
+      }
+    })
+  }
 });
