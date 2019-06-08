@@ -1,16 +1,29 @@
 import React , {Component} from "react";
 import {View,Text,TouchableOpacity, StyleSheet,Dimensions,TextInput} from "react-native";
+import propTypes from "prop-types";
 
 const {height , width} = Dimensions.get("window");
 export default class Todo extends Component {
-    state = {
-        isEditing : false,
-        isCompleted : false,
-        toDoValue : ""
+    constructor(props){
+        super(props);
+        this.state = {
+            isEditing : false,
+            toDoValue : props.text,
+            isCompleted : false
+        }
     }
+    static propTypes = {
+        text : propTypes.string.isRequired,
+        isCompleted : propTypes.bool.isRequired,   
+        deleteToDo : propTypes.func.isRequired,
+        id : propTypes.string.isRequired
+    }
+
+    
     render(){
+          
         const {isCompleted , isEditing,toDoValue} = this.state;
-        const {text} = this.props;
+        const {text,deleteToDo,id} = this.props;
         return (
             <View style={styles.container}>
                 <View style={styles.column}>
@@ -20,7 +33,7 @@ export default class Todo extends Component {
                     {/* <Text style={[styles.text, isCompleted ? styles.completeText : styles.uncompleteText]} >{text}</Text> */}
                     {isEditing ? (
                         <TextInput 
-                            multiline={true}
+                            // multiline={true}
                             returnKeyType={"done"}
                             style={[ styles.text,styles.input]}
                             value={toDoValue}
@@ -46,7 +59,7 @@ export default class Todo extends Component {
                             </View>
                         </TouchableOpacity>
                         
-                        <TouchableOpacity>
+                        <TouchableOpacity onPressOut={() => deleteToDo(id)}>
                         <View style={styles.actionContainer}>
                             <Text style={styles.actionText}>❌</Text>
                             </View>

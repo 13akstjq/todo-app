@@ -6,6 +6,7 @@ import uuidv1 from "uuid/v1"
 const {height,width} = Dimensions.get("window");
 export default class App extends Component {
 
+  
   state = {
     newToDo : "",
     loadedToDos: false,
@@ -53,6 +54,19 @@ export default class App extends Component {
         return {...newState};
     })
   };
+
+  _deleteTodo = (id) =>{
+    this.setState( prevState => {
+      const toDos = prevState.toDos;
+      delete toDos[id];
+      const newState = {
+        ...prevState,
+        ...toDos
+      };
+      return {...newState};
+    })
+  }
+
   componentDidMount(){
   this._loadToDos();
   }
@@ -79,7 +93,7 @@ export default class App extends Component {
            onSubmitEditing={this._addTodo}
            ></TextInput>
            <ScrollView contentContainerStyle={styles.toDos}>
-             {Object.values(toDos).map(toDo => <Todo key={toDo.id} {...toDo}></Todo>)}
+             {Object.values(toDos).map(toDo => <Todo key={toDo.id} {...toDo} deleteToDo={this._deleteTodo}></Todo>)}
            </ScrollView>
         </View>
       </View>
