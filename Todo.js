@@ -8,26 +8,29 @@ export default class Todo extends Component {
         super(props);
         this.state = {
             isEditing : false,
-            toDoValue : props.text,
-            isCompleted : false
+            toDoValue : props.text
         }
     }
     static propTypes = {
         text : propTypes.string.isRequired,
         isCompleted : propTypes.bool.isRequired,   
         deleteToDo : propTypes.func.isRequired,
-        id : propTypes.string.isRequired
+        completeToDo : propTypes.func.isRequired,
+        uncompleteToDo : propTypes.func.isRequired,
+        id : propTypes.string.isRequired,
+        updateToDo : propTypes.func.isRequired
     }
 
     
     render(){
           
-        const {isCompleted , isEditing,toDoValue} = this.state;
-        const {text,deleteToDo,id} = this.props;
+        const {isEditing,toDoValue} = this.state;
+        const {text,deleteToDo,id ,isCompleted} = this.props;
+        console.log(isCompleted);
         return (
             <View style={styles.container}>
                 <View style={styles.column}>
-                    <TouchableOpacity onPress={this._toggleComplete}>
+                    <TouchableOpacity onPressOut={this._toggleComplete}>
                         <View style={[styles.circle, isCompleted ? styles.completeCircle : styles.uncompletedCircle]}></View>
                     </TouchableOpacity>
                     {/* <Text style={[styles.text, isCompleted ? styles.completeText : styles.uncompleteText]} >{text}</Text> */}
@@ -71,12 +74,20 @@ export default class Todo extends Component {
         );
     }
     _toggleComplete = () => {
-        this.setState(prevState => {
-            return ({
-                isCompleted : !prevState.isCompleted //현재 state의 반대 값을 넣음 == toggle
-            })
-        })
-    }
+        //isCompleted를 App.js에서 직접 주지 않지만 toDos의 object안에 있는 속성이라 알아서 props로 해주는것 같음. 
+      const {isCompleted,completeToDo,uncompleteToDo , id} = this.props; 
+      if(isCompleted){ //완료한 항목 클릭시 -> 완료안한 상태로 바꿈
+        uncompleteToDo(id);
+      }else { // 완료 안한 항목 클릭시 -> 완료 상태로 바꿈 
+        completeToDo(id); 
+      }
+    //App.js에서 prop형태로 주는 것이 좋기 때문에 아래와 같이 state로 isCompleted를 사용하는 형태는 좋지 않음. 
+    // this.setState( prevState =>{ 
+    //     return {
+    //         isCompleted : !prevState.isCompleted
+    //         };
+    //     });
+    };
     _startEditing = () => {
         const {text} = this.props;
         
@@ -86,6 +97,10 @@ export default class Todo extends Component {
         });
     }
     _finishEditing =() =>{
+        const {updateToDo,id} = this.props;
+        const {toDoValue} = this.state;
+        console.log(toDoValue);
+        updateToDo(id,toDoValue);
         this.setState({
             isEditing : false
         });

@@ -1,5 +1,5 @@
 import React , {Component}from 'react';
-import { StyleSheet, Text, View,StatusBar,Dimensions ,Platform ,TextInput,ScrollView} from 'react-native';
+import { StyleSheet, Text, View,StatusBar,Dimensions ,Platform ,TextInput,ScrollView,AsyncStorage} from 'react-native';
 import {AppLoading} from "expo";
 import Todo from "./Todo.js";
 import uuidv1 from "uuid/v1"
@@ -13,16 +13,30 @@ export default class App extends Component {
     toDos: {}
   };
 
-  _controlNewToDo = text => {
+  _controlNewToDo = text => { 
     this.setState({
       newToDo : text
     });
   };
 
-  _loadToDos = () => {
-    this.setState({
-      loadedToDos : true
-    });
+  _loadToDos = async () => {
+    try{
+      const loadToDos = await AsyncStorage.getItem("realtodo");
+      console.log("loadToDos : " + loadToDos);
+      const parseDos = JSON.parse(loadToDos);
+        // console.log(parseDos);
+        this.setState({
+          loadedToDos : true,
+          toDos : parseDos || {}
+        });
+     
+    }catch(err){
+      console.log(err);
+    }
+    // this.setState({
+    //   loadedToDos : true,
+    //   // toDos : parseDos
+    // });
   };
 
   _addTodo = () => {
@@ -46,6 +60,7 @@ export default class App extends Component {
             ...newToDoObject
           }
         };
+        this._saveTodo(newState);
         if(newToDo !== ""){ // 입력한 todo가 있다면 
           this.setState({
             newToDo : ""
@@ -63,9 +78,70 @@ export default class App extends Component {
         ...prevState,
         ...toDos
       };
+      this._saveTodo(newState.toDos);
       return {...newState};
-    })
+    });
+  };
+
+  _updateTodo = (id,text) => {
+    console.log("app.js " + text);
+    this.setState(prevState => {
+      const newState = {
+       ...prevState,
+       toDos : {
+        ...prevState.toDos,
+        [id] : {
+          ...prevState.toDos[id],
+          text : text
+        }
+       } 
+      }
+      this._saveTodo(newState.toDos);
+      return {...newState};
+    });
+  };
+
+  _saveTodo = (newToDos) => {
+    console.log(JSON.stringify(newToDos));
+    const saveToDos = AsyncStorage.setItem("realtodo",JSON.stringify(newToDos));
   }
+  _completeToDo = (id) =>{ // todo를 완료할 때 호출하는 함수 
+    console.log("finish");
+
+    this.setState ( prevState =>{  
+      const newState = {
+        ...prevState,
+        toDos:{
+          ...prevState.toDos,
+          [id] : {
+            ...prevState.toDos[id],
+            isCompleted : true
+          }
+        }
+      }
+      this._saveTodo(newState.toDos);
+      return {...newState}
+    });
+  };
+
+  _uncompleteToDo = (id) =>{ // todo를 완료를 취소할 때 호출하는 함수
+    console.log("unfinish");
+
+    this.setState ( prevState =>{
+      const newState = {
+        ...prevState,
+        toDos:{
+          ...prevState.toDos,
+          [id] : {
+            ...prevState.toDos[id],
+            isCompleted : false
+          }
+        }
+      }
+      this._saveTodo(newState.toDostate);
+      return {...newState}
+    });
+  };
 
   componentDidMount(){
   this._loadToDos();
@@ -93,7 +169,17 @@ export default class App extends Component {
            onSubmitEditing={this._addTodo}
            ></TextInput>
            <ScrollView contentContainerStyle={styles.toDos}>
-             {Object.values(toDos).map(toDo => <Todo key={toDo.id} {...toDo} deleteToDo={this._deleteTodo}></Todo>)}
+             {Object.values(toDos)
+             .reverse()
+             .map(toDo => 
+             <Todo
+              key={toDo.id}
+              deleteToDo={this._deleteTodo}
+              completeToDo={this._completeToDo}
+              uncompleteToDo={this._uncompleteToDo}
+              updateToDo={this._updateTodo}
+              {...toDo}
+                ></Todo>)}
            </ScrollView>
         </View>
       </View>
