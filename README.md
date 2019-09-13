@@ -1,3 +1,3 @@
 # todo-app
-todo-app with React Native
+todo-app with React Native app
 
